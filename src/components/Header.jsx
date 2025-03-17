@@ -1,15 +1,31 @@
 import React, { useState } from "react";
 import { SortIcon, InfoIcon, SettingsIcon } from "../assets/icons/HeaderIcons.jsx";
 import WordleLogo from "../assets/images/wordlelogo.png";
-import InfoModal from "./InfoModals.jsx";
+import { InfoModal, StatsModal, SettingsModal } from "./Modals.jsx";
 
 function Header() {
     const [isInfoModalOpen, setInfoModal] = useState(false);
+    const [isStatsModalOpen, setStatsModal] = useState(false);
+    const [isSettingsModalOpen, setSettingsModal] = useState(false);
+
     const handleInfoModalClose = () => {
         setInfoModal(false);
     };
     const handleInfoModalOpen = () => {
         setInfoModal(true);
+    };
+    const handleStatsModalClose = () => {
+        setStatsModal(false);
+    };
+    const handleStatsModalOpen = () => {
+        setStatsModal(true);
+    };
+
+    const handleSettingsModalClose = () => {
+        setSettingsModal(false);
+    };
+    const handleSettingsModalOpen = () => {
+        setSettingsModal(true);
     };
 
     return (
@@ -22,15 +38,17 @@ function Header() {
                 <div onClick={handleInfoModalOpen}>
                     <InfoIcon />
                 </div>
-                <div onClick={handleInfoModalOpen}>
+                <div onClick={handleStatsModalOpen}>
                     <SortIcon />
                 </div>
-                <div onClick={handleInfoModalOpen}>
+                <div onClick={handleSettingsModalOpen}>
                     <SettingsIcon />
                 </div>
             </div>
 
             <InfoModal isOpen={isInfoModalOpen} onClose={handleInfoModalClose} />
+            <StatsModal isOpen={isStatsModalOpen} onClose={handleStatsModalClose} />
+            <SettingsModal isOpen={isSettingsModalOpen} onClose={handleSettingsModalClose} />
         </div>
     );
 }
