@@ -10,8 +10,8 @@ function Board() {
                         <div
                             id={`board-box-${rowIndex * 5 + colIndex}`}
                             key={colIndex}
-                            className="flex items-center justify-center p-5 m-1 transition-shadow duration-300 border shadow-lg h-14 w-14 sm:w-16 sm:h-16 hover:shadow-2xl"
-                        >{`${rowIndex * 5 + colIndex}`}</div>
+                            className="flex items-center justify-center p-5 m-1 font-extrabold transition-shadow duration-300 border shadow-lg h-14 w-14 sm:w-16 sm:h-16 hover:shadow-2xl"
+                        ></div>
                     ))}
                 </div>
             ))}

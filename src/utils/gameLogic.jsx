@@ -27,31 +27,70 @@ export default function handleKeyboardClick(key) {
 }
 
 export function dyeDiv(statusForDyeAction) {
-    if (howManyQuess !== 0) {
-        howManyQuess = howManyQuess * 5;
-    }
-
     if (statusForDyeAction === "dyeWin") {
-        if (howManyQuess !== 0) {
-            howManyQuess = howManyQuess * 5;
-        }
+        divFinderFromQuess = howManyQuess * 5; // Calculate the starting index for the current guess
         for (let i = 0; i < 5; i++) {
-            const divLocation = "board-box-" + (howManyQuess + i);
-            const boardDiv = document.getElementById(`${divLocation}`);
-            boardDiv.style.backgroundColor = "green";
+            const divBoxLocation = "board-box-" + (divFinderFromQuess + i);
+            const boardDiv = document.getElementById(`${divBoxLocation}`);
+            if (boardDiv) {
+                boardDiv.style.backgroundColor = "green"; // Dye the winning boxes green
+            }
         }
 
         if (confettiCallback) {
-            confettiCallback(true);
+            confettiCallback(true); // Trigger confetti on win
         }
     }
+
     if (statusForDyeAction === "checkForDye") {
-        console.log("checking");
-        for (let i = 0; i < 6; i++) {
-            for (let j = 0; j < 6; j++) {
-                if (keyboardKeys[i] === selectedWord[j]) {
-                    console.log(selectedWord[j]);
-                    console.log(keyboardKeys[i]);
+        divFinderFromQuess = (howManyQuess - 1) * 5; // Calculate the starting index for the current guess
+
+        // Create a copy of the selectedWord to track which letters have been matched
+        let tempSelectedWord = selectedWord.split("");
+        let matchedIndexes = []; // To track matched indexes for yellow and green
+
+        // First pass: mark correct letters (green)
+        for (let i = 0; i < 5; i++) {
+            if (keyboardKeys[i] === tempSelectedWord[i]) {
+                const divBoxLocation = "board-box-" + (divFinderFromQuess + i);
+                const boardDiv = document.getElementById(`${divBoxLocation}`);
+                if (boardDiv) {
+                    boardDiv.style.backgroundColor = "green"; // Dye the correct letters green
+                    boardDiv.style.color = "white"; // Set text color to white for visibility
+                }
+                // Mark the letter as used
+                tempSelectedWord[i] = null; // Mark this letter as matched
+                matchedIndexes.push(i); // Store matched index
+            }
+        }
+
+        // Second pass: mark letters that are in the word but in the wrong position (yellow)
+        for (let i = 0; i < 5; i++) {
+            if (keyboardKeys[i] !== tempSelectedWord[i]) {
+                // Only check unused letters
+                const index = tempSelectedWord.indexOf(keyboardKeys[i]);
+                if (index !== -1) {
+                    const divBoxLocation = "board-box-" + (divFinderFromQuess + i);
+                    const boardDiv = document.getElementById(`${divBoxLocation}`);
+                    if (boardDiv) {
+                        boardDiv.style.backgroundColor = "yellow"; // Dye the letters yellow
+                        boardDiv.style.color = "black"; // Set text color to black for visibility
+                    }
+                    // Mark the letter as used
+                    tempSelectedWord[index] = null; // Mark this letter as matched
+                    matchedIndexes.push(i); // Store matched index
+                }
+            }
+        }
+
+        // Third pass: mark letters that are not in the word (gray)
+        for (let i = 0; i < 5; i++) {
+            if (keyboardKeys[i] !== "_" && tempSelectedWord[i] !== null && !matchedIndexes.includes(i)) {
+                const divBoxLocation = "board-box-" + (divFinderFromQuess + i);
+                const boardDiv = document.getElementById(`${divBoxLocation}`);
+                if (boardDiv) {
+                    boardDiv.style.backgroundColor = "gray"; // Dye the letters gray
+                    boardDiv.style.color = "white"; // Set text color to white for visibility
                 }
             }
         }
@@ -64,7 +103,7 @@ function selectedKeyEnter(key) {
         keyboardKeys = "";
     } else if (keyboardKeys.length === 5) {
         if (totalBoardKeys.length === 30) {
-            selectedKeyReset();
+            return null;
         }
         howManyQuess += 1;
         dyeDiv("checkForDye");
@@ -107,25 +146,35 @@ export function setConfettiCallback(callback) {
 
 //RESET CONTROLLERS
 function selectedKeyReset() {
-    keyboardKeys = "";
-    totalBoardKeys = "";
-    selectedWord = turkishWords[Math.floor(Math.random() * turkishWords.length)];
-    resetBoardText();
-    selectedWordFunc();
+    keyboardKeys = ""; // Clear the current input
+    totalBoardKeys = ""; // Clear all previous guesses
+    selectedWord = turkishWords[Math.floor(Math.random() * turkishWords.length)]; // Select a new word
+    resetBoardText(); // Reset the board display
+    selectedWordFunc(); // Select a new word for the next round
     if (confettiCallback) {
-        confettiCallback(null);
+        confettiCallback(null); // Reset confetti callback
     }
 }
 
 function resetBoardText() {
+    // Her bir kutunun sıfırlanması işlemi
     for (let i = 0; i < 30; i++) {
         const boardDiv = document.getElementById("board-box-" + i);
         if (boardDiv) {
-            boardDiv.textContent = totalBoardKeys[i];
-            boardDiv.style.backgroundColor = "transparent";
-            console.log("RESETTED");
+            boardDiv.textContent = ""; // Metni temizle
+            boardDiv.style.backgroundColor = "transparent"; // Arka plan rengini sıfırla
+            boardDiv.style.color = "white"; // Yazı rengini beyaz yap
+            boardDiv.style.border = "1px solid white"; // Kenarlık rengini beyaz yap
+            boardDiv.style.transition = "background-color 0.3s ease"; // Geçiş efekti
+            boardDiv.style.opacity = "1"; // Opaklık değerini sıfırla
         }
     }
+
+    // Diğer oyun verilerini sıfırla
+    keyboardKeys = ""; // Mevcut tahmini sıfırla
+    totalBoardKeys = ""; // Tüm önceki tahminleri sıfırla
+    howManyQuess = 0; // Tahmin sayısını sıfırla
+    console.log("Game reset successful!");
 }
 
 //ACTIONS
